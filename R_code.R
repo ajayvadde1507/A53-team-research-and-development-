@@ -1,31 +1,27 @@
 ############################################################
-# MEMBER 2 (Sadhik): Enhanced Visualisation Contribution
+# MEMBER 4 (Siddu): Model Validation & Interpretation
 ############################################################
 
-# Violin plot: Raised Hands by Class
-p_violin <- ggplot(df, aes(x = Class, y = raisedhands, fill = Class)) +
-  geom_violin(trim = FALSE, alpha = 0.6) +
-  geom_boxplot(width = 0.1, outlier.shape = NA) +
-  labs(
-    title = "Distribution of Raised Hands by Performance Class",
-    x = "Performance Class",
-    y = "Raised Hands"
-  ) +
-  theme_minimal()
+# Null model
+null_model <- multinom(Class ~ 1, data = mod_df, trace = FALSE)
 
-print(p_violin)
-ggsave("violin_raisedhands_by_class.png", p_violin, width = 7, height = 5)
+# Log-likelihoods
+ll_full <- logLik(multinom_mod)
+ll_null <- logLik(null_model)
 
+# McFadden Pseudo R-squared
+pseudo_r2 <- 1 - (ll_full / ll_null)
+cat("\nMcFadden Pseudo R-squared:", round(pseudo_r2, 4), "\n")
 
-# Scatter plot: VisITedResources vs Discussion
-p_scatter <- ggplot(df, aes(x = VisITedResources, y = Discussion, color = Class)) +
-  geom_point(alpha = 0.6) +
-  labs(
-    title = "Visited Resources vs Discussion Activity",
-    x = "Visited Resources",
-    y = "Discussion Posts"
-  ) +
-  theme_minimal()
+# Prediction & Confusion Matrix
+predicted_class <- predict(multinom_mod, mod_df)
+confusion_matrix <- table(
+  Predicted = predicted_class,
+  Actual = mod_df$Class
+)
 
-print(p_scatter)
-ggsave("scatter_resources_discussion.png", p_scatter, width = 7, height = 5)
+print(confusion_matrix)
+
+# Save for appendix
+write.csv(confusion_matrix, "confusion_matrix_multinomial.csv")
+cat("Confusion matrix saved as 'confusion_matrix_multinomial.csv'\n")
