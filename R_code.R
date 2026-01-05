@@ -28,3 +28,30 @@ df <- read.csv(data_path, stringsAsFactors = FALSE)
 # Quick structure check
 str(df)
 summary(df) 
+
+# ---- 2. Basic cleaning & factor conversions ----
+df <- df %>%
+  mutate(across(where(is.character), ~ trimws(.)))
+
+df <- df %>%
+  mutate(
+    gender = factor(gender),
+    StageID = factor(StageID),
+    GradeID = factor(GradeID),
+    SectionID = factor(SectionID),
+    Topic = factor(Topic),
+    Semester = factor(Semester),
+    Relation = factor(Relation)
+  )
+
+df$Class <- toupper(df$Class)
+df$Class <- ifelse(df$Class == "L", "Low",
+                   ifelse(df$Class == "M", "Medium",
+                          ifelse(df$Class == "H", "High", NA)))
+df$Class <- factor(df$Class, levels = c("Low","Medium","High"))
+
+activity_vars <- c("raisedhands","VisITedResources",
+                   "AnnouncementsView","Discussion")
+
+df[activity_vars] <- lapply(df[activity_vars], function(x)
+  as.numeric(as.character(x))) 
