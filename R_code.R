@@ -20,3 +20,11 @@ library(nnet)
 library(broom)
 library(rstatix)
 library(ggpubr)
+
+# ---- 1. Load data ----
+data_path <- "xAPI-Edu-Data.csv"   # keep relative path
+df <- read.csv(data_path, stringsAsFactors = FALSE)
+
+# Quick structure check
+str(df)
+summary(df) 
